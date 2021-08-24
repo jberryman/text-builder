@@ -61,6 +61,9 @@ import qualified Data.ByteString as ByteString
 import qualified DeferredFolds.Unfoldr as Unfoldr
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
+import qualified Data.Text.Internal.Unsafe.Char as TC
+import qualified Data.Text.Internal.Encoding.Utf8 as TC
+ 
 
 
 newtype Action =
@@ -157,7 +160,12 @@ char x =
 {-# INLINE unicodeCodePoint #-}
 unicodeCodePoint :: Int -> Builder
 unicodeCodePoint x =
-  D.unicodeCodePoint x utf16CodeUnits1 utf16CodeUnits2
+  Builder action (TC.utf8Length c) 1
+  where
+    c = chr x -- TODO pointless ord/chr via char above
+    action =
+      Action $ \array offset ->
+          (void $ TC.unsafeWrite array offset c)
 
 {-| Single code-unit UTF-16 character -}
 {-# INLINABLE utf16CodeUnits1 #-}
@@ -165,8 +173,9 @@ utf16CodeUnits1 :: Word16 -> Builder
 utf16CodeUnits1 unit =
   Builder action 1 1
   where
-    action =
-      Action $ \array offset -> B.unsafeWrite array offset unit
+    action = error "Not implemented for UTF8 text yet"
+    -- action =
+    --   Action $ \array offset -> B.unsafeWrite array offset unit
 
 {-| Double code-unit UTF-16 character -}
 {-# INLINABLE utf16CodeUnits2 #-}
@@ -174,10 +183,10 @@ utf16CodeUnits2 :: Word16 -> Word16 -> Builder
 utf16CodeUnits2 unit1 unit2 =
   Builder action 2 1
   where
-    action =
-      Action $ \array offset -> do
-        B.unsafeWrite array offset unit1
-        B.unsafeWrite array (succ offset) unit2
+    action = error "Not implemented for UTF8 text yet"
+      -- Action $ \array offset -> do
+      --   B.unsafeWrite array offset unit1
+      --   B.unsafeWrite array (succ offset) unit2
 
 {-| Single code-unit UTF-8 character -}
 {-# INLINE utf8CodeUnits1 #-}
