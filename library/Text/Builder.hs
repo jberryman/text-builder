@@ -234,7 +234,7 @@ text text@(C.Text array offset length) =
   where
     action =
       Action $ \builderArray builderOffset -> do
-        B.copyI builderArray builderOffset array offset (builderOffset + length)
+        B.copyI builderArray builderOffset array offset length
 
 {-| String -}
 {-# INLINE string #-}
